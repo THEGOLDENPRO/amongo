@@ -1,9 +1,7 @@
 # SPDX-License-Identifier: MIT
 """A MongoDB collection."""
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from amongo.cursor import Cursor
 
@@ -46,7 +44,7 @@ class Collection:
 
     async def delete(
         self,
-        q: dict[str, Any],
+        q: Dict[str, Any],
         limit: int = 0,
     ) -> int:
         """Delete one or more documents.
@@ -76,7 +74,7 @@ class Collection:
 
         return result["n"]
 
-    async def delete_one(self, q: dict[str, Any]) -> int:
+    async def delete_one(self, q: Dict[str, Any]) -> int:
         """Delete a single document.
 
         Args:
@@ -87,7 +85,7 @@ class Collection:
         """
         return await self.delete(q, 1)
 
-    async def insert_many(self, documents: list[dict[str, Any]]) -> int:
+    async def insert_many(self, documents: List[Dict[str, Any]]) -> int:
         """Insert one or more documents.
 
         Args:
@@ -105,7 +103,7 @@ class Collection:
         )
         return result["n"]
 
-    async def insert_one(self, document: dict[str, Any]) -> int:
+    async def insert_one(self, document: Dict[str, Any]) -> int:
         """Insert a single document.
 
         Args:
@@ -118,11 +116,11 @@ class Collection:
 
     async def find(
         self,
-        q: dict[str, Any],
-        skip: int | None = None,
-        limit: int | None = None,
-        max: int | None = None,
-        min: int | None = None,
+        q: Dict[str, Any],
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
+        max: Optional[int] = None,
+        min: Optional[int] = None,
     ) -> Cursor:
         """Select documents from the collection.
 
@@ -136,7 +134,7 @@ class Collection:
         Returns:
             Cursor: The cursor to iterate over the documents.
         """  # noqa: E501
-        doc: dict[str, Any] = {
+        doc: Dict[str, Any] = {
             "find": self._name,
             "filter": q,
             "$db": self._db,
@@ -157,7 +155,7 @@ class Collection:
         result = await self._connection._send_and_wait(doc)
         return Cursor(self._connection, result)
 
-    async def find_one(self, q: dict[str, Any]) -> dict[str, Any]:
+    async def find_one(self, q: Dict[str, Any]) -> Dict[str, Any]:
         """Select a single document from the collection.
 
         Args:

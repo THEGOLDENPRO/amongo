@@ -1,9 +1,8 @@
 """A MongoDB cursor."""
 # SPDX-License-Identifier: MIT
-
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict, List, Dict
 
 if TYPE_CHECKING:
     from .connection import Connection
@@ -11,7 +10,7 @@ if TYPE_CHECKING:
 
 class _CursorType(TypedDict):
     id: int
-    nextBatch: list[dict[str, Any]]
+    nextBatch: List[Dict[str, Any]]
     ns: str
 
 
@@ -40,7 +39,7 @@ class Cursor:
         """Get the cursor as an async iterator."""
         return self
 
-    async def __anext__(self) -> dict[str, Any]:
+    async def __anext__(self) -> Dict[str, Any]:
         """Get the next document from the cursor."""
         try:
             return await self.next()
@@ -51,7 +50,7 @@ class Cursor:
         """Get the string representation of the cursor."""
         return f"<Cursor {self._cursor['ns']}#{self._cursor['id']}>"
 
-    async def next(self) -> dict[str, Any]:
+    async def next(self) -> Dict[str, Any]:
         """Get the next document from the cursor.
 
         Raises
