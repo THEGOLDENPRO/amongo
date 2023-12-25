@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, TypedDict
+from typing import Any, TypedDict, List
 
 
 class Hello(TypedDict):
@@ -14,5 +14,5 @@ class Hello(TypedDict):
     minWireVersion: int
     maxWireVersion: int
     readOnly: bool
-    compression: list[str]
-    saslSupportedMechs: list[str]
+    compression: List[str]
+    saslSupportedMechs: List[str]

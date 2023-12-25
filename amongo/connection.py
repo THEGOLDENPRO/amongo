@@ -4,10 +4,10 @@ import asyncio
 import random
 import struct
 from asyncio import StreamReader, StreamWriter
-from typing import Any, NamedTuple, TypeVar
 from urllib.parse import ParseResult, urlparse
+from typing import Any, NamedTuple, TypeVar, Optional, Dict
 
-import bson
+import pybson
 
 from ._flags import Flags
 from ._header import MessageHeader
@@ -31,14 +31,14 @@ class Connection:
         Args:
             uri (str): The URI to connect to.
         """
-        self.__reader: StreamReader | None = None
-        self.__writer: StreamWriter | None = None
+        self.__reader: Optional[StreamReader] = None
+        self.__writer: Optional[StreamWriter] = None
         self._uri: ParseResult = urlparse(uri)
-        self.__hello: Hello | None = None
-        self._task: asyncio.Task[None] | None = None
-        self._waiters: dict[int, asyncio.Future[_WireItem]] = {}
+        self.__hello: Optional[Hello] = None
+        self._task: Optional[asyncio.Task[None]] = None
+        self._waiters: Dict[int, asyncio.Future[_WireItem]] = {}
 
-    def _fail_if_none(self, value: T | None) -> T:
+    def _fail_if_none(self, value: Optional[T]) -> T:
         if value is None:
             msg = "Connection not established. Did you forget to call `open()`?"
             raise RuntimeError(msg)
@@ -95,7 +95,7 @@ class Connection:
             raise NotImplementedError(msg)
             # TODO: Implement other types of sections
 
-        return bson.loads(data.data[5:])
+        return pybson.loads(data.data[5:])
 
     async def _send_and_wait(self, data: Any) -> Any:
         """Send an OP_MSG with kind 0 and wait for the matching response.
@@ -115,7 +115,7 @@ class Connection:
 
         data_bytes += int(flags).to_bytes(4, "little")
         data_bytes += int(0).to_bytes(1, "little")  # kind
-        data_bytes += bson.dumps(data)  # payload
+        data_bytes += pybson.dumps(data)  # payload
 
         header = MessageHeader(
             message_length=16 + len(data_bytes),
